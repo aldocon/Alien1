@@ -14,7 +14,6 @@
 //   implement a lexer token (keyword) for range 
 ////////////////////////////////////////////////////////////////////
 
-
 {
 module Lexer
 
@@ -102,6 +101,14 @@ rule Token = parse
                           }
   | '+'                   { Parser.PLUS   (getPos lexbuf) }
   | '-'                   { Parser.MINUS  (getPos lexbuf) }
+  | '*'                   { Parser.MULT   (getPos lexbuf) }
+  | '/'                   { Parser.DIV    (getPos lexbuf) }
+  | "&&"                  { Parser.AND    (getPos lexbuf) }
+  | "||"                  { Parser.OR     (getPos lexbuf) }
+  | "true"                { Parser.TRUE   (getPos lexbuf) }
+  | "false"               { Parser.FALSE  (getPos lexbuf) }
+  | "not"                 { Parser.NEGBOO (getPos lexbuf) } //negate boole
+  | '∼'                   { Parser.NEGINT (getPos lexbuf) } //negate int
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }
