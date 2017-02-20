@@ -108,22 +108,34 @@ and checkExp  (ftab : FunTable)
         Implement by pattern matching Plus/Minus above.
         See `AbSyn.fs` for the expression constructors of `Times`, ...
     *)
-    | Times (_, _, _) ->        
-        failwith "Unimplemented type check of multiplication"
 
-    | Divide (_, _, _) ->
-        failwith "Unimplemented type check of division"
+    | Divide (e1, e2, pos) ->
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        let (t2, e2_dec) = checkExp ftab vtab e2
+        if (Int = t1 && Int = t2)
+        then (Int, Divide (e1_dec, e2_dec, pos))
+        else raise (MyError ("In Divide: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
 
-    | And (_, _, _) ->
-        failwith "Unimplemented type check of &&"
-
-    | Or (_, _, _) ->
+    | Times (e1, e2, pos) ->
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        let (t2, e2_dec) = checkExp ftab vtab e2
+        if (Int = t1 && Int = t2)
+        then (Int, Times (e1_dec, e2_dec, pos))
+        else raise (MyError ("In Multiply: one of subexpression types is not Int: "+ppType t1+" and "+ppType t2, pos))
+        
+    | And (e1, e2, pos) ->
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        let (t2, e2_dec) = checkExp ftab vtab e2
+        if (Bool = t1 && Bool = t2)
+        then (Bool, And (e1_dec, e2_dec, pos))
+        else raise (MyError ("In And: one of subexpression types is not Bool: "+ppType t1+" and "+ppType t2, pos))
+    | Or (e1, e2, pos) ->
         failwith "Unimplemented type check of ||"
 
-    | Not (_, _) ->
+    | Not  (e1, pos) ->
         failwith "Unimplemented type check of not"
 
-    | Negate (_, _) ->
+    | Negate (e1, pos) ->
         failwith "Unimplemented type check of negate"
 
     (* The types for e1, e2 must be the same. The result is always a Bool. *)
@@ -245,7 +257,8 @@ and checkExp  (ftab : FunTable)
             | Int -> (Array a_tp, Replicate(n_dec, a_dec, a_tp, pos))
             | _ -> raise (MyError ("Replicate error: n_exp not of int type " + ppType n_tp, pos))
 
-    (* TODO project task 2: Hint for `map(f, arr)`
+
+    (*  TODO project task 2: Hint for `map(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`.
         Use `checkFunArg` to get the signature of the function argument `f`.
         If `f` has type `ta -> tb` then 

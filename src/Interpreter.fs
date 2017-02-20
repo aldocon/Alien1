@@ -162,12 +162,22 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         e.g., `And (e1, e2, pos)` should not evaluate `e2` if `e1` already
               evaluates to false. 
   *)
-  | Times(_, _, _) ->        
-        failwith "Unimplemented interpretation of multiplication"
+  | Times(e1, e2, pos) ->        
+        let res1   = evalExp(e1, vtab, ftab)
+        let res2   = evalExp(e2, vtab, ftab)
+        match (res1, res2) with
+          | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
+          | _ -> invalidOperands "Multiplication on non-integral args: " [(Int, Int)] res1 res2 pos
+
   | Divide(_, _, _) ->
         failwith "Unimplemented interpretation of division"
-  | And (_, _, _) ->
-        failwith "Unimplemented interpretation of &&"
+  | And (e1, e2, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        let r2 = evalExp(e2, vtab, ftab)
+        match (r1, r2) with
+          | (BoolVal b1, BoolVal b2) -> BoolVal (b1 && b2)
+          | (_, _) -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+
   | Or (_, _, _) ->
         failwith "Unimplemented interpretation of ||"
   | Not(_, _) ->
@@ -247,15 +257,14 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
          the value of `a`; otherwise raise an error (containing 
          a meaningful message).
   *)
-  | Replicate (n_exp, a _exp, _, pos) ->
+  | Replicate (n_exp, a_exp, _, pos) ->
       let n_val = evalExp(n_exp, vtab, ftab)
       let a_val = evalExp(a_exp, vtab, ftab)
       match n_val with
-          | IntVal a ->
-            if n >= o
-            then ArrayVal (List.repicate n a_val, valueType a_val)
+          | IntVal n ->
+            if n >= 0
+            then ArrayVal (List.replicate n a_val, valueType a_val)
             else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
-               -> MyError("Replicate error ... MISSING" + ppVal 0 n_val, pos))
 
   (* TODO project task 2: `map(f, arr)`
        pattern match the implementation of reduce:

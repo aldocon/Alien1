@@ -67,7 +67,7 @@ let keyword (s, pos) =
        | "reduce"       -> Parser.REDUCE pos
        | "read"         -> Parser.READ pos
        | "write"        -> Parser.WRITE pos
-       | "replicate"    -> Parser.REP pos
+       | "replicate"    -> Parser.REPLICATE pos
 
        | _              -> Parser.ID (s, pos)
 
@@ -110,7 +110,7 @@ rule Token = parse
   | "true"                { Parser.TRUE   (getPos lexbuf) }
   | "false"               { Parser.FALSE  (getPos lexbuf) }
   | "not"                 { Parser.NEGBOO (getPos lexbuf) } //negate boole
-  | '∼'                   { Parser.NEGINT (getPos lexbuf) } //negate int
+  //| '∼'                   { Parser.NEGINT (getPos lexbuf) } //negate int
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }
