@@ -247,8 +247,15 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
          the value of `a`; otherwise raise an error (containing 
          a meaningful message).
   *)
-  | Replicate (_, _, _, _) ->
-        failwith "Unimplemented interpretation of replicate"
+  | Replicate (n_exp, a _exp, _, pos) ->
+      let n_val = evalExp(n_exp, vtab, ftab)
+      let a_val = evalExp(a_exp, vtab, ftab)
+      match n_val with
+          | IntVal a ->
+            if n >= o
+            then ArrayVal (List.repicate n a_val, valueType a_val)
+            else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
+               -> MyError("Replicate error ... MISSING" + ppVal 0 n_val, pos))
 
   (* TODO project task 2: `map(f, arr)`
        pattern match the implementation of reduce:

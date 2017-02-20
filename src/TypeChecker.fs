@@ -238,8 +238,12 @@ and checkExp  (ftab : FunTable)
         - assuming `a` is of type `t` the result type 
           of replicate is `[t]`
     *)
-    | Replicate (_, _, _, _) ->
-        failwith "Unimplemented type check of replicate"
+    |  Replicate (n_exp, a_exp, _, pos) ->
+        let (n_tp, n_dec) = checkExp ftab vtab n_exp 
+        let (a_tp, a_dec) = checkExp ftab vtab a_exp
+        match n_tp with
+            | Int -> (Array a_tp, Replicate(n_dec, a_dec, a_tp, pos))
+            | _ -> raise (MyError ("Replicate error: n_exp not of int type " + ppType n_tp, pos))
 
     (* TODO project task 2: Hint for `map(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`.
