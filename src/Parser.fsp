@@ -46,7 +46,9 @@ let parse_error_rich =
 
 %nonassoc ifprec letprec
 %left DEQ LTH
+%left AND OR
 %left PLUS MINUS
+%left MULT DIV
 
 %start Prog
 %type <AbSyn.UntypedProg> Prog

@@ -1,0 +1,9 @@
+#Exclude all files 
+/*
+#Make exception for .gitignore
+!.gitignore
+#Exclude all swp files made by editors
+*/*.swp
+#Make exception for folders src and tests
+!/src
+!/tests
