@@ -172,9 +172,13 @@ let rec compileExp  (e      : TypedExp)
       else
         [ Mips.LUI (place, makeConst (n / 65536))
         ; Mips.ORI (place, place, makeConst (n % 65536)) ]
-  | Constant (BoolVal _, _) ->
+  | Constant (BoolVal b, pos) ->
       (* TODO project task 1: represent `true`/`false` values as `1`/`0` *)
-      failwith "Unimplemented code generation of boolean constants"
+      if b then 
+        [ Mips.LI (place, makeConst 1) ]
+      else
+        [ Mips.LI (place, makeConst 0) ]
+
   | Constant (CharVal c, pos) -> [ Mips.LI (place, makeConst (int c)) ]
 
   (* Create/return a label here, collect all string literals of the program
@@ -244,11 +248,19 @@ let rec compileExp  (e      : TypedExp)
         `Times` and `Divide` are very similar to `Plus`/`Minus`
         `Not` and `Negate` are simpler; you can use `Mips.XORI` for `Not`
   *)
-  | Times (_, _, _) ->
-      failwith "Unimplemented code generation of multiplication"
+  | Times (e1, e2, pos) ->
+      let t1 = newName "times_L"
+      let t2 = newName "times_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      code1 @ code2 @ [Mips.MUL (place,t1,t2)]
 
-  | Divide (_, _, _) ->
-      failwith "Unimplemented code generation of division"
+  | Divide (e1, e2, pos) ->
+      let t1 = newName "divide_L"
+      let t2 = newName "divide_R"
+      let code1 = compileExp e1 vtable t1
+      let code2 = compileExp e2 vtable t2
+      code1 @ code2 @ [Mips.DIV (place,t1,t2)]
 
   | Not (_, _) ->
       failwith "Unimplemented code generation of not"

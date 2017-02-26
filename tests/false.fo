@@ -1,0 +1,3 @@
+fun bool main() =
+  let n = false in
+    write(n)
