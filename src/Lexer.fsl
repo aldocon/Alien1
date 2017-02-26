@@ -61,6 +61,8 @@ let keyword (s, pos) =
        | "char"         -> Parser.CHAR pos
        | "fun"          -> Parser.FUN pos
        | "fn"           -> Parser.FN pos
+       | "true"         -> Parser.TRUE pos
+       | "false"        -> Parser.FALSE pos
 
 (* specials: *)
        | "iota"         -> Parser.IOTA pos
@@ -107,8 +109,6 @@ rule Token = parse
   | '/'                   { Parser.DIV    (getPos lexbuf) }
   | "&&"                  { Parser.AND    (getPos lexbuf) }
   | "||"                  { Parser.OR     (getPos lexbuf) }
-  | "true"                { Parser.TRUE   (getPos lexbuf) }
-  | "false"               { Parser.FALSE  (getPos lexbuf) }
   | "not"                 { Parser.NEGBOO (getPos lexbuf) } //negate boole
   //| '∼'                   { Parser.NEGINT (getPos lexbuf) } //negate int
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
