@@ -169,21 +169,31 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
           | (IntVal n1, IntVal n2) -> IntVal (n1*n2)
           | _ -> invalidOperands "Multiplication on non-integral args: " [(Int, Int)] res1 res2 pos
 
-  | Divide(_, _, _) ->
-        failwith "Unimplemented interpretation of division"
+  | Divide(e1, e2, pos) ->
+        let res1   = evalExp(e1, vtab, ftab)
+        let res2   = evalExp(e2, vtab, ftab)
+        match (res1, res2) with
+          | (IntVal n1, IntVal n2) -> IntVal (n1/n2)
+          | _ -> invalidOperands "Division on non-integral args: " [(Int, Int)] res1 res2 pos
+
   | And (e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         let r2 = evalExp(e2, vtab, ftab)
         match (r1, r2) with
           | (BoolVal b1, BoolVal b2) -> BoolVal (b1 && b2)
           | (_, _) -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
-
   | Or (_, _, _) ->
         failwith "Unimplemented interpretation of ||"
   | Not(_, _) ->
         failwith "Unimplemented interpretation of not"
-  | Negate(_, _) ->
-        failwith "Unimplemented interpretation of negate"
+    
+  | Negate(e1, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        match (r1) with
+          | IntVal  n1 -> IntVal (-n1)
+          | true       -> false
+          | false      -> true
+          | _          -> invalidOperands "Invalid negate operand types" [Int; Bool] r1 pos
 
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
@@ -265,6 +275,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
             if n >= 0
             then ArrayVal (List.replicate n a_val, valueType a_val)
             else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
+          | otherwise -> raise (MyError("Read operation is valid only on basic types ", pos))
+
 
   (* TODO project task 2: `map(f, arr)`
        pattern match the implementation of reduce:

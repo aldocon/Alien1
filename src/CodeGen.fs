@@ -253,8 +253,20 @@ let rec compileExp  (e      : TypedExp)
   | Not (_, _) ->
       failwith "Unimplemented code generation of not"
 
-  | Negate (_, _) ->
-      failwith "Unimplemented code generation of negate"
+  | Negate (e1, pos) ->
+      match e1 with
+        | Int  -> [ Mips.JAL ("getint",["2"])
+                  ; Mips.MOVE(place,"2")
+                  ]
+        | Bool ->
+          let tl = newName "true_lab"
+          let fl = newName "false_lab"
+          [ Mips.JAL ("getint", ["2"])
+          ; Mips.MOVE(v, "2")
+
+      let t1 = newName "negate"
+      let code1 = compileExp e1 vtable t1
+      code1 @ [Mips.XORI (place,t1)]
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
