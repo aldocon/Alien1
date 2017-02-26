@@ -1,5 +1,6 @@
 #Exclude all files 
 /*
+*/*.asm
 #Make exception for .gitignore
 !.gitignore
 #Exclude all swp files made by editors
