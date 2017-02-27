@@ -109,8 +109,8 @@ rule Token = parse
   | '/'                   { Parser.DIV    (getPos lexbuf) }
   | "&&"                  { Parser.AND    (getPos lexbuf) }
   | "||"                  { Parser.OR     (getPos lexbuf) }
-  | "not"                 { Parser.NEGBOO (getPos lexbuf) } //negate boole
-  | '∼'                   { Parser.NEGINT (getPos lexbuf) } //negate int
+  | "not"                 { Parser.NOT    (getPos lexbuf) } //negate boole
+  | '∼'                   { Parser.NEGATE (getPos lexbuf) } //negate int
   | "=>"                  { Parser.ARROW  (getPos lexbuf) }
   | "=="                  { Parser.DEQ    (getPos lexbuf) }
   | '='                   { Parser.EQ     (getPos lexbuf) }

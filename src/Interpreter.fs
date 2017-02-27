@@ -182,18 +182,22 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         match (r1, r2) with
           | (BoolVal b1, BoolVal b2) -> BoolVal (b1 && b2)
           | (_, _) -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+
   | Or (_, _, _) ->
         failwith "Unimplemented interpretation of ||"
-  | Not(_, _) ->
-        failwith "Unimplemented interpretation of not"
-    
+
+  | Not(e1, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        match (r1) with
+          | BoolVal true       -> BoolVal false
+          | BoolVal false      -> BoolVal true
+          | other              -> raise (MyError("If condition is not a boolean", pos))
+
   | Negate(e1, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         match (r1) with
           | IntVal  n1 -> IntVal (-n1)
-          | true       -> false
-          | false      -> true
-          | _          -> invalidOperands "Invalid negate operand types" [Int; Bool] r1 pos
+          | other              -> raise (MyError("If condition is not a boolean", pos))
 
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)

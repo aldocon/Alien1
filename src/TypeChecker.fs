@@ -134,14 +134,16 @@ and checkExp  (ftab : FunTable)
         failwith "Unimplemented type check of ||"
 
     | Not  (e1, pos) ->
-        failwith "Unimplemented type check of not"
-
+        let  (t1, e1') = checkExp ftab vtab e1
+        if (Bool = t1)
+        then (Bool, Not (e1', pos))
+        else raise (MyError ("In Not: subexpression type is not Bool: " + ppType t1, pos))
+        
     | Negate (e1, pos) ->
         let  (t1, e1') = checkExp ftab vtab e1
-        if (Bool = t1 || IntVal = t1)
-        then (Bool, Negate (e1', pos))
-        else raise (MyError ("In Negate: subexpression type is not Bool or Int: " + ppType t1, pos))
-    
+        if (Int = t1)
+        then (Int, Negate (e1', pos))
+        else raise (MyError ("In Negate: subexpression type is not Int: " + ppType t1, pos))
         
     (* The types for e1, e2 must be the same. The result is always a Bool. *)
     | Equal (e1, e2, pos) ->

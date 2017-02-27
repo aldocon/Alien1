@@ -162,7 +162,7 @@ let applyRegs  ( fid  : Mips.addr
 let rec compileExp  (e      : TypedExp)
                     (vtable : VarTable)
                     (place  : Mips.reg)
-                  : Mips.Instruction list =
+                    : Mips.Instruction list =
   match e with
   | Constant (IntVal n, pos) ->
       if n < 0 then
@@ -262,23 +262,15 @@ let rec compileExp  (e      : TypedExp)
       let code2 = compileExp e2 vtable t2
       code1 @ code2 @ [Mips.DIV (place,t1,t2)]
 
-  | Not (_, _) ->
-      failwith "Unimplemented code generation of not"
+  | Not (e1, pos) ->      
+      (*let t1 = newName "not"
+      let code1 = compileExp e1 vtable t1
+      code1 @ [Mips.XORI (place,t1, makeConst 0)]*)
+      failwith "Unimplemented code generation of Negate"
 
   | Negate (e1, pos) ->
-      match e1 with
-        | Int  -> [ Mips.JAL ("getint",["2"])
-                  ; Mips.MOVE(place,"2")
-                  ]
-        | Bool ->
-          let tl = newName "true_lab"
-          let fl = newName "false_lab"
-          [ Mips.JAL ("getint", ["2"])
-          ; Mips.MOVE(v, "2")
+      failwith "Unimplemented code generation of Negate"
 
-      let t1 = newName "negate"
-      let code1 = compileExp e1 vtable t1
-      code1 @ [Mips.XORI (place,t1)]
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable

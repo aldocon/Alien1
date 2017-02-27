@@ -118,9 +118,9 @@ type Exp<'T> =
   | Times  of Exp<'T> * Exp<'T> * Position
   | Divide of Exp<'T> * Exp<'T> * Position
   | Negate of Exp<'T> * Position
+  | Not of Exp<'T> * Position
   | And of Exp<'T> * Exp<'T> * Position
   | Or  of Exp<'T> * Exp<'T> * Position
-  | Not of Exp<'T> * Position
 
   (* Array constructors/combinators implementations *)
   | Iota   of Exp<'T> * Position
