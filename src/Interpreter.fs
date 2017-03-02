@@ -181,23 +181,27 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         let r2 = evalExp(e2, vtab, ftab)
         match (r1, r2) with
           | (BoolVal b1, BoolVal b2) -> BoolVal (b1 && b2)
-          | (_, _) -> invalidOperands "Invalid equality operand types" [(Int, Int); (Bool, Bool); (Char, Char)] r1 r2 pos
+          | (_, _) -> invalidOperands "Invalid equality operand types" [(Bool, Bool)] r1 r2 pos
 
-  | Or (_, _, _) ->
-        failwith "Unimplemented interpretation of ||"
-
+  | Or (e1, e2, pos) ->
+        let r1 = evalExp(e1, vtab, ftab)
+        let r2 = evalExp(e2, vtab, ftab)
+        match (r1, r2) with
+          | (BoolVal b1, BoolVal b2) -> BoolVal (b1 || b2)
+          | (_, _) -> invalidOperands "Invalid equality operand types" [(Bool, Bool)] r1 r2 pos
+          
   | Not(e1, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         match (r1) with
-          | BoolVal true       -> BoolVal false
-          | BoolVal false      -> BoolVal true
-          | other              -> raise (MyError("If condition is not a boolean", pos))
+          | BoolVal true      -> BoolVal false
+          | BoolVal false     -> BoolVal true
+          | other             -> raise (MyError("Argument is not a boolean", pos))
 
   | Negate(e1, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
         match (r1) with
           | IntVal  n1 -> IntVal (-n1)
-          | other              -> raise (MyError("If condition is not a boolean", pos))
+          | other              -> raise (MyError("Argument is not an int", pos))
 
   | Equal(e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
