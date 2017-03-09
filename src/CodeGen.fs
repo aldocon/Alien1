@@ -262,18 +262,15 @@ let rec compileExp  (e      : TypedExp)
       let code2 = compileExp e2 vtable t2
       code1 @ code2 @ [Mips.DIV (place,t1,t2)]
 
-
-
-
-
   | Not (e1, pos) ->      
       let t1 = newName "not"
       let code1 = compileExp e1 vtable t1
-      code1 @ [Mips.XORI (place,t1,makeConst 0xffff0000)]
-      failwith "Unimplemented code generation of Negate"
+      code1 @ [Mips.XORI (place,t1,makeConst 1)]
 
   | Negate (e1, pos) ->
-      failwith "Unimplemented code generation of Negate"
+      let t1 = newName "not"
+      let code1 = compileExp e1 vtable t1
+      code1 @ [Mips.SUB (place,makeConst 0, t1)]
 
   | Let (dec, e1, pos) ->
       let (code1, vtable1) = compileDec dec vtable
