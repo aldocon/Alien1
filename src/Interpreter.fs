@@ -285,7 +285,6 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
             else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
           | otherwise -> raise (MyError("Read operation is valid only on basic types ", pos))
 
-
   (* TODO project task 2: `map(f, arr)`
        pattern match the implementation of reduce:
        - get the result type of `f`  (use `rtpFunArg` defined below)
