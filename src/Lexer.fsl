@@ -71,9 +71,8 @@ let keyword (s, pos) =
        | "read"         -> Parser.READ pos
        | "write"        -> Parser.WRITE pos
        | "replicate"    -> Parser.REPLICATE pos
-
+       | "map"          -> Parser.MAP pos
        | _              -> Parser.ID (s, pos)
-
 }
 
 rule Token = parse

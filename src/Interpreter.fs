@@ -293,8 +293,13 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
        - use F# `List.map` to evaluate `f(a)` for every element (value) `a` of `arr`,
        - create an `ArrayVal` from the (list) result of the previous step.
   *)
-  | Map (_, _, _, _, _) ->
-        failwith "Unimplemented interpretation of map"
+  | Map (farg, arr_exp, t_in, t_out, pos) ->
+      let a_val = evalExp(arr_exp, vtab, ftab)
+      let f_arg_ret_t = rtpFunArg farg ftab pos
+      match a_val with
+        | ArrayVal (lst,tp1) ->
+            ArrayVal(List.map (fun x -> evalFunArg(farg, vtab, ftab, pos, [x])) lst, f_arg_ret_t)
+        | otherwise -> raise (MyError("Second argument of map is not an array: " + ppVal 0 a_val, pos))
 
   (* TODO project task 2: `scan(f, ne, arr)`
      Implementation similar to reduce, except that it produces an array 
