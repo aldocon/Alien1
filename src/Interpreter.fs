@@ -178,17 +178,29 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
 
   | And (e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
-        let r2 = evalExp(e2, vtab, ftab)
-        match (r1, r2) with
-          | (BoolVal b1, BoolVal b2) -> BoolVal (b1 && b2)
-          | (_, _) -> invalidOperands "Invalid equality operand types" [(Bool, Bool)] r1 r2 pos
+        match r1 with
+          | BoolVal b1 ->
+              if(b1)
+              then 
+                let r2 = evalExp(e2, vtab, ftab)
+                match r2 with
+                  | BoolVal b2 -> BoolVal (b1 && b2)
+                  | _ -> invalidOperand "Invalid && operand type" (Bool) r2 pos
+              else BoolVal (false)
+          | _ -> invalidOperand "Invalid && operand type" (Bool) r1 pos
 
   | Or (e1, e2, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
-        let r2 = evalExp(e2, vtab, ftab)
-        match (r1, r2) with
-          | (BoolVal b1, BoolVal b2) -> BoolVal (b1 || b2)
-          | (_, _) -> invalidOperands "Invalid equality operand types" [(Bool, Bool)] r1 r2 pos
+        match r1 with
+          | BoolVal b1 ->
+              if(b1)
+              then BoolVal (b1)
+              else
+                let r2 = evalExp(e2, vtab, ftab)
+                match r2 with
+                  | BoolVal b2 -> BoolVal (b1 || b2)
+                  | _ -> invalidOperand "Invalid || operand type" (Bool) r2 pos
+          | _ -> invalidOperand "Invalid || operand types" (Bool) r1 pos
           
   | Not(e1, pos) ->
         let r1 = evalExp(e1, vtab, ftab)
