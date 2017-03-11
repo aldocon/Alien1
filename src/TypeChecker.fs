@@ -271,8 +271,49 @@ and checkExp  (ftab : FunTable)
          - `arr` should be of type `[ta]`
          - the result of `map` should have type `[tb]`
     *)
-    | Map (_, _, _, _, _) ->
-        failwith "Unimplemented type check of map"
+    | Map (f, arr_exp, _, _, pos) ->
+        let (arr_t, arr_dec) = checkExp ftab vtab arr_exp
+        let elem_type = 
+          match arr_t with
+            | Array t -> t
+            | other -> raise(MyError ("Map: Argument not an array", pos))
+
+        match checkFunArg ftab vtab pos f with
+            | (f, res, [a1;a2]) ->
+                if a1 = a2 && a1 = res
+                then (Array res, Map(f, arr_dec, a1, a2, pos))
+                else raise (MyError( "Map: incompatible function type of " + 
+                                    (ppFunArg 0 f) + ": " + showFunType ([a1;a2], res)
+                                     , pos))
+            | (_, res, args) ->
+                raise (MyError( "Map: incompatible function type of " + 
+                                    (ppFunArg 0 f) + ": " + showFunType (args, res)
+                                     , pos))
+
+//        let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
+//        let elem_type =
+//            match arr_type with
+//              | Array t -> t
+//              | other -> raise (MyError ("Map: Argument not an array", pos))
+//        let (f', f_arg_type) = 
+//          match checkFunArg ftab vtab pos f with
+//              | (f', res, [a1;a2]) ->
+//                 if a1 = a2 && a1 = res
+//                 then (f', res)
+//                 else raise (MyError( "Map: incompatible function type of " +
+//                                       (ppFunArg 0 f) + ": " + showFunType ([a1,a2], res)
+//                                        , pos))
+//              | (_, res, args) ->
+//                raise (MyError ( "Reduce: incompatible function type of " +
+//                                  ppFunArg 0 f + ": " + showFunType (args, res)
+//                                , pos))
+//        let err (s, t) = MyError ( "Reduce: unexpected " + s + " type " + ppType t +
+//                                   ", expected " + ppType f_arg_type
+//                                 , pos)
+//        if   elem_type = f_arg_type then
+//             (elem_type, Map (f_arg_type, arr_dec, arr_type, f_arg_type, pos))
+//        else raise (err ("array element", elem_type))
+
 
     (* TODO project task 2: `scan(f, ne, arr)` 
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.
