@@ -551,7 +551,7 @@ let rec compileExp  (e      : TypedExp)
          ]
 
   (* TODO project task 2: 
-        `replicate(n, a)`
+        `replicate (n, a)`
         `map (f, arr)`
         `scan(f, ne, arr)`
      Look in `AbSyn.fs` for the shape of expression constructors
@@ -583,6 +583,7 @@ let rec compileExp  (e      : TypedExp)
       let a_reg = newName "a_reg"
       let loop_beg  = newName "loop_beg"
       let loop_end  = newName "loop_end"
+      
       let n_code = compileExp n_exp vtable n_reg
       let a_code = compileExp a_exp vtable a_reg
       let alloc_code = dynalloc (n_reg, place, el_tp)
