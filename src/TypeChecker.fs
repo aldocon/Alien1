@@ -220,7 +220,7 @@ and checkExp  (ftab : FunTable)
         else raise (MyError ("Iota: wrong argument type "+ppType e_type, pos))
 
     | Reduce (f, n_exp, arr_exp, _, pos) ->
-        let (n_type  , n_dec  ) = checkExp ftab vtab n_exp
+        let (n_type  , n_dec) = checkExp ftab vtab n_exp
         let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
         let elem_type =
             match arr_type with
@@ -263,7 +263,6 @@ and checkExp  (ftab : FunTable)
         match n_tp with
             | Int -> (Array a_tp, Replicate(n_dec, a_dec, a_tp, pos))
             | _ -> raise (MyError ("Replicate error: n_exp not of int type " + ppType n_tp, pos))
-
 
     (*  TODO project task 2: Hint for `map(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`.

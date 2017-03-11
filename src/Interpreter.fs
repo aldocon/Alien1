@@ -325,6 +325,13 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
           | BoolVal b -> let res = if(b) then "true " else "false "
                          printfn "%s" res
           | CharVal c -> printfn "%c " c
+          | ArrayVal (a, Bool) ->
+             let mapfun = function
+                   | BoolVal c -> c
+                   | otherwise -> raise (MyError("Write argument " +
+                                                   ppVal 0 v +
+                                                   " should have been evaluated to string", p))
+             printfn "%s" ( System.String.Concat (List.map mapfun a) )
           | ArrayVal (a, Char) ->
              let mapfun = function
                    | CharVal c -> c

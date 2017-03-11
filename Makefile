@@ -38,7 +38,7 @@ FastoExe=bin/Fasto.exe
 all: bin/fasto
 
 bin/fasto: $(FastoExe)
-	mkbundle --cross default bin/Fasto.exe bin/*.dll lib/*.dll -o bin/fasto
+	mkbundle bin/Fasto.exe bin/*.dll lib/*.dll -o bin/fasto
 
 $(LexerGen): src/Lexer.fsl
 	$(fslex) src/Lexer.fsl -o $(LexerGen)
