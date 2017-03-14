@@ -131,7 +131,11 @@ and checkExp  (ftab : FunTable)
         else raise (MyError ("In And: one of subexpression types is not Bool: "+ppType t1+" and "+ppType t2, pos))
 
     | Or (e1, e2, pos) ->
-        failwith "Unimplemented type check of ||"
+        let (t1, e1_dec) = checkExp ftab vtab e1
+        let (t2, e2_dec) = checkExp ftab vtab e2
+        if (Bool = t1 && Bool= t2)
+        then (Bool, Or (e1_dec, e2_dec, pos))
+        else raise (MyError ("In Or: one of subexpression types is not boolean: "+ppType t1+" and "+ppType t2, pos))
 
     | Not  (e1, pos) ->
         let  (t1, e1') = checkExp ftab vtab e1
