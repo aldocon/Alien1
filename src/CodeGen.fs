@@ -645,9 +645,6 @@ let rec compileExp  (e      : TypedExp)
        @ loop_code_1
        @ [Mips.J loop_beg; Mips.LABEL(loop_end)]
 
-
-               
-
   (* TODO project task 2: see also the comment to replicate.
      `map(f, arr)`:  has some similarity with the implementation of iota.
      Use `applyFunArg` to call `f(a)` in a loop, for every element `a` of `arr`.
@@ -664,72 +661,74 @@ let rec compileExp  (e      : TypedExp)
         the current location of the result iterator at every iteration of
         the loop.
   *)
-    | Scan (farg, acc_exp, arr_exp, tp, pos) =>
-      let val arr_reg   = newName "arr_reg"   // Address of array 
-          val size_reg  = newName "size_reg"  // original array Size 
-          val i_reg     = newName "i_reg"     // Counter. 
-          val new_size  = newName "new_size"  // Size, new array. 
-          val tmp_reg   = newName "tmp_reg"   // Temp register
-          val res_reg   = newName "res_reg"   // reserved register
-          val startlabl = newName "startlabl" // Start label.
-          val endlabl   = newName "endlabl"   // end label.
-          val neu_el    = newName "neu_el"    // Neutral element, see the report for explanation.
-          val elreadreg = newName "elreadreg" // readable element.
-          val elwritreg = newName "elwritreg" // Where to write the final element. 
+  | Scan (farg, acc_exp, arr_exp, tp, pos) ->
+      let  arr_reg   = newName "arr_reg"   // Address of array 
+      let  size_reg  = newName "size_reg"  // original array Size 
+      let  i_reg     = newName "i_reg"     // Counter. 
+      let  new_size  = newName "new_size"  // Size, new array. 
+      let  tmp_reg   = newName "tmp_reg"   // Temp register
+      let  res_reg   = newName "res_reg"   // reserved register
+      let  startLabel = newName "startLabel" // Start label.
+      let  endLabel   = newName "endLabel"   // end label.
+      let  neu_ele    = newName "neu_ele"    // Neutral element, see the report for explanation.
+      let  eleReadReg = newName "eleReadReg" // readable element.
+      let  eleWriteReg = newName "eleWriteReg" // Where to write the final element. 
 
-          val arr_code  = compileExp arr_exp vtable arr_reg
-          val get_size  = [ Mips.LW (size_reg, arr_reg, "0") ]
-          val comp_size = [ Mips.ADDI (new_size, size_reg, "1") ]
-          val neu_code  = compileExp acc_exp vtable neu_el
+      let arr_code  = compileExp arr_exp vtable arr_reg
+      let getSize  = [ Mips.LW (size_reg, arr_reg, "0") ]
+      let comSize = [ Mips.ADDI (new_size, size_reg, "1") ]
+      let neuCode  = compileExp acc_exp vtable neu_ele
 
-          val set_r_w   = case getElemSize tp of
-                            One  => [ Mips.ADDI (elreadreg, arr_reg, "4")
-                                    , Mips.ADDI (elwritreg, place, "5") ]
-                          | Four => [ Mips.ADDI (elreadreg, arr_reg, "4")
-                                    , Mips.ADDI (elwritreg, place, "8") ]
+      let setRead_Write = match getElemSize tp with
+                            One  -> [ Mips.ADDI (eleReadReg, arr_reg, "4")
+                                    ; Mips.ADDI (eleWriteReg, place, "5") ]
+                          | Four -> [ Mips.ADDI (eleReadReg, arr_reg, "4")
+                                    ; Mips.ADDI (eleWriteReg, place, "8") ]
 
-          val whileinit = case getElemSize tp of
-                            One  => [ Mips.LI (i_reg, "0")
-                                    , Mips.SB (neu_el, place, "4") ]
-                          | Four => [ Mips.LI (i_reg, "0")
-                                    , Mips.SW (neu_el, place, "4") ]
+      let whileStart = match getElemSize tp with
+                            One  -> [ Mips.LI (i_reg, "0")
+                                    ; Mips.SB (neu_ele, place, "4") ]
+                          | Four -> [ Mips.LI (i_reg, "0")
+                                    ; Mips.SW (neu_ele, place, "4") ]
 
-          val whilecond = [ Mips.LABEL startlabl
-                          , Mips.SLT (tmp_reg, i_reg, size_reg)
-                          , Mips.BEQ (tmp_reg, "0", endlabl) ]
+      let whileCond = [ Mips.LABEL startLabel
+                          ; Mips.SLT (tmp_reg, i_reg, size_reg)
+                          ; Mips.BEQ (tmp_reg, "0", endLabel) ]
 
-          val whileloop = case getElemSize tp of
-                            One  => [ Mips.LB (res_reg, elreadreg, "0")
-                                    , Mips.LB (tmp_reg, elwritreg, "-1") ]
-                                    @ applyFunArg(farg, [tmp_reg, res_reg],
+      let whileLoop = match getElemSize tp with
+                            One  -> [ Mips.LB (res_reg, eleReadReg, "0")
+                                    ; Mips.LB (tmp_reg, eleWriteReg, "-1") ]
+                                    @ applyFunArg(farg, [res_reg],
                                                   vtable, res_reg, pos)
-                                    @ [ Mips.SB (res_reg, elwritreg, "0")
-                                    , Mips.ADDI (elreadreg, elreadreg, "1")
-                                    , Mips.ADDI (elwritreg, elwritreg, "1")
-                                    , Mips.ADDI (i_reg, i_reg, "1")
-                                    , Mips.J startlabl ]
-                          | Four => [ Mips.LW (res_reg, elreadreg, "0")
-                                    , Mips.LW (tmp_reg, elwritreg, "-4") ]
-                                    @ applyFunArg(farg, [tmp_reg, res_reg],
+                                    @ [ Mips.SB (res_reg, eleWriteReg, "0")
+                                    ; Mips.ADDI (eleReadReg, eleReadReg, "1")
+                                    ; Mips.ADDI (eleWriteReg, eleWriteReg, "1")
+                                    ; Mips.ADDI (i_reg, i_reg, "1")
+                                    ; Mips.J startLabel ]
+                          | Four -> [ Mips.LW (res_reg, eleReadReg, "0")
+                                    ; Mips.LW (tmp_reg, eleWriteReg, "-4") ]
+                                    @ applyFunArg(farg, [res_reg],
                                                   vtable, res_reg, pos)
-                                    @ [ Mips.SW (res_reg, elwritreg, "0")
-                                    , Mips.ADDI (elreadreg, elreadreg, "4")
-                                    , Mips.ADDI (elwritreg, elwritreg, "4")
-                                    , Mips.ADDI (i_reg, i_reg, "1")
-                                    , Mips.J startlabl ]
+                                    @ [ Mips.SW (res_reg, eleWriteReg, "0")
+                                    ; Mips.ADDI (eleReadReg, eleReadReg, "4")
+                                    ; Mips.ADDI (eleWriteReg, eleWriteReg, "4")
+                                    ; Mips.ADDI (i_reg, i_reg, "1")
+                                    ; Mips.J startLabel ]
 
-          val while_end = [ Mips.LABEL endlabl ]
+      let whileEndLabel = [ Mips.LABEL endLabel ]
 
-      in arr_code  @ (* Compute input array expr. *)
-         get_size  @ (* Save size of input array to size_reg. *)
-         comp_size @ (* Calculate size of new arr. *)
-         neu_code  @ (* Compute the neutral element. *)
-         dynalloc (new_size, place, tp) @ (* Allocates space for res. *)
-         set_r_w   @ (* Set read and write registers. *)
-         whileinit @ (* While initialization. *)
-         whilecond @ (* Test the while condition. *)
-         whileloop @ (* Code of while. *)
-         while_end   (* While end label. *)
+      in arr_code  @ 
+          getSize @  // Save size of input array to size_reg. 
+          comSize @  // size of new arr. 
+          neuCode @   // the neutral element evaluated 
+          dynalloc (new_size, place, tp) @  // dunamic allocation of space.
+          setRead_Write @   // Read and Write to registers
+          whileStart @ // while loop start.
+          whileCond @ // test the while condition
+          whileLoop @ // the while loop core.
+          whileEndLabel  // End label for the while loop.
+          
+         
 and applyFunArg ( ff     : TypedFunArg
                 , args   : Mips.reg list
                 , vtable : VarTable
