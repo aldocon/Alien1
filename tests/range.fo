@@ -1,0 +1,4 @@
+
+
+fun int main() =
+  let a = range(0,4,5) in write(a[3])
