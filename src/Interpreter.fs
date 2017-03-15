@@ -304,8 +304,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
       match (a_val, n_val, s_val) with
           | (IntVal a, IntVal n, IntVal s) ->             
               if n >= 0
-              then ArrayVal((List.replicate n a_val), Int)            
-              else raise (MyError("Range Error: n less than 0: " + ppVal 0 n_val, pos))
+              then ArrayVal (List.map (fun i -> IntVal (a+(i*s))) [0..(n-1)], Int)
+              else raise (MyError("Range Error: n less than 0: " + ppVal 0 n_val, pos))  
           | otherwise -> raise (MyError("Range Error: n less than 0: " + ppVal 0 n_val, pos))
 
   (* TODO project task 2: `map(f, arr)`
@@ -333,7 +333,8 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
         let nel  = evalExp(ne, vtab, ftab)
         match arr with
           | ArrayVal (lst,tp1) ->
-               List.fold (fun acc x -> evalFunArg (farg, vtab, ftab, pos, [acc;x])) nel lst
+               let newlst = List.tail (List.scan (fun acc x -> evalFunArg (farg, vtab, ftab, pos, [acc;x])) nel lst)
+               ArrayVal(newlst, tp1)
           | otherwise -> raise (MyError("Third argument of Scan is not an array: "+ppVal 0 arr
                                        , pos))
   | Read (t,p) ->
