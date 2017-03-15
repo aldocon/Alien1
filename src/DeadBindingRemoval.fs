@@ -109,6 +109,13 @@ let rec removeDeadBindingsInExp (e : TypedExp) =
             (nio || eio,
              nuses @ euses,
              Replicate (n', e', t, pos))
+        | Range (e1, e2, e3, pos) ->
+            let (io1, uses1, e1') = removeDeadBindingsInExp e1
+            let (io2, uses2, e2') = removeDeadBindingsInExp e2
+            let (io3, uses3, e3') = removeDeadBindingsInExp e3
+            (io1 || io2 || io3,
+             uses1 @ uses2 @ uses3,
+             Range(e1', e2', e3', pos))
         | Scan (farg, e1, e2, t, pos) ->
             let (io1, uses1, e1') = removeDeadBindingsInExp e1
             let (io2, uses2, e2') = removeDeadBindingsInExp e2

@@ -173,6 +173,11 @@ let rec copyConstPropFoldExp (vtable : VarTable)
                     copyConstPropFoldExp vtable e1,
                     copyConstPropFoldExp vtable e2,
                     t, pos)
+        | Range (e1, e2, e3, pos) ->
+            let e1' = copyConstPropFoldExp vtable e1
+            let e2' = copyConstPropFoldExp vtable e2
+            let e3' = copyConstPropFoldExp vtable e3
+            Range (e1', e2', e3', pos)         
         | Replicate (n, e, t, pos) ->
             Replicate (copyConstPropFoldExp vtable n,
                        copyConstPropFoldExp vtable e,

@@ -42,6 +42,7 @@ let rec expCalls = function
     | Map (farg, e, _, _, _) -> fargCalls farg @ expCalls e
     | Reduce (farg, e1, e2, _, _) -> fargCalls farg @ expCalls e1 @ expCalls e2
     | Replicate (n, e, _, _) -> expCalls n @ expCalls e
+    | Range (e1, e2, e3, _) -> expCalls e1 @ expCalls e2 @ expCalls e3
     | Scan (farg, e1, e2, _, _) -> fargCalls farg @ expCalls e1 @ expCalls e2
     | Times (e1, e2, _) -> expCalls e1 @ expCalls e2
     | Divide (e1, e2, _) -> expCalls e1 @ expCalls e2

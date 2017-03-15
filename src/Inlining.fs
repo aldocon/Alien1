@@ -53,6 +53,10 @@ let rec inlineInExp (graph : CallGraph)
                     inlineInExp graph prog e1,
                     inlineInExp graph prog e2,
                     t, pos)
+        | Range (e1, e2, e3, pos) ->
+            Range (inlineInExp graph prog e1,
+                   inlineInExp graph prog e2,
+                   inlineInExp graph prog e3, pos)
         | Replicate (n, e, t, pos) ->
             Replicate (inlineInExp graph prog n,
                        inlineInExp graph prog e,
