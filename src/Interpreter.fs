@@ -292,10 +292,21 @@ let rec evalExp (e : UntypedExp, vtab : VarTable, ftab : FunTable) : Value =
       let a_val = evalExp(a_exp, vtab, ftab)
       match n_val with
           | IntVal n ->
-            if n >= 0
-            then ArrayVal (List.replicate n a_val, valueType a_val)
-            else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
-          | otherwise -> raise (MyError("Read operation is valid only on basic types ", pos))
+              if n >= 0
+              then ArrayVal (List.replicate n a_val, valueType a_val)
+              else raise (MyError("Replicate Error: n less than 0: " + ppVal 0 n_val, pos))
+          | otherwise -> raise (MyError("Replicate operation is valid only on with n as type int", pos))
+
+  | Range (a_exp, n_exp, s_exp, pos) ->
+      let a_val = evalExp(a_exp, vtab, ftab)
+      let n_val = evalExp(n_exp, vtab, ftab)
+      let s_val = evalExp(s_exp, vtab, ftab)
+      match (a_val, n_val, s_val) with
+          | (IntVal a, IntVal n, IntVal s) ->             
+              if n >= 0
+              then ArrayVal((List.replicate n a_val), Int)            
+              else raise (MyError("Range Error: n less than 0: " + ppVal 0 n_val, pos))
+          | otherwise -> raise (MyError("Range Error: n less than 0: " + ppVal 0 n_val, pos))
 
   (* TODO project task 2: `map(f, arr)`
        pattern match the implementation of reduce:

@@ -507,6 +507,9 @@ let rec compileExp  (e      : TypedExp)
        @ loop_iota
        @ loop_footer
 
+  | Range (a, n, s, pos) ->
+      failwith "Unimplemented code generation of range"
+  
   (* reduce(f, acc, {x1, x2, ...}) = f(..., f(x2, f(x1, acc))) *)
   | Reduce (binop, acc_exp, arr_exp, tp, pos) ->
       let arr_reg  = newName "arr_reg"   (* address of array *)
@@ -612,8 +615,6 @@ let rec compileExp  (e      : TypedExp)
        @ loop_code_1
        @ [Mips.J loop_beg; Mips.LABEL(loop_end)]
                
-
-
 
   (* TODO project task 2: see also the comment to replicate.
      `map(f, arr)`:  has some similarity with the implementation of iota.

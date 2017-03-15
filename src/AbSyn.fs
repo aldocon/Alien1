@@ -130,6 +130,8 @@ type Exp<'T> =
   *)
   | Replicate of Exp<'T> * Exp<'T> * 'T * Position
 
+  | Range  of Exp<'T> * Exp<'T> * Exp<'T> * Position
+
   (* map (f, array)
       the first 'T corresponds to the mapped array element type,
        which is the same as the f's input type;
@@ -229,6 +231,7 @@ let rec ppExp d = function
   | Reduce (f, el, lst, _, _)   ->
       "reduce(" + ppFunArg d f + ", " + ppExp d el + ", " + ppExp d lst + ")"
   | Replicate (n, e, _, _)         -> "replicate(" + ppExp d n + ", " + ppExp d e + ")"
+  | Range (e1, e2, e3, _)         -> "range(" + ppExp d e1 + ", "  + ppExp d e2 +  ", "  + ppExp d e3 + ")"
   | Scan (f, el, lst, _, _) ->
       "scan(" + ppFunArg d f + ", " + ppExp d el + ", " + ppExp d lst + ")"
   | Read (t, _)                 -> "read(" + ppType t + ")"
@@ -264,6 +267,7 @@ let expPos = function
   | Iota (_, p) -> p
   | Map (_, _, _, _, p) -> p
   | Reduce (_, _, _, _, p) -> p
+  | Range (_, _, _, p) -> p
   | Replicate (_, _, _, p) -> p
   | Scan (_, _, _, _, p) -> p
   | Read (_, p) -> p

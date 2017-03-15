@@ -39,15 +39,17 @@ let parse_error_rich =
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS
-%token <(int*int)> MULT DIV AND OR DEQ LTH EQ REPLICATE OP REDUCE IOTA ARROW MAP
-%token <(int*int)> TRUE FALSE NEGATE NOT FUN FN COMMA SEMICOLON READ WRITE
+%token <(int*int)> RANGE REPLICATE REDUCE IOTA
+%token <(int*int)> MULT DIV AND OR DEQ LTH EQ OP ARROW MAP
+%token <(int*int)> TRUE FALSE NOT FUN FN COMMA SEMICOLON READ WRITE
+%token <(int*int)> NEGATE
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
-%left DEQ LTH
+%left DEQ LTH NOT
 %left AND OR
 %left PLUS MINUS
-%left MULT DIV NEGATE NOT
+%left MULT DIV NEGATE
 
 %start Prog
 %type <AbSyn.UntypedProg> Prog
@@ -118,6 +120,8 @@ Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
                      { Write ($3, (), $1) }
     | IOTA LPAR Exp RPAR
                      { Iota ($3, $1) }
+    | RANGE LPAR Exp COMMA Exp COMMA Exp RPAR
+                     { Range ($3, $5, $7, $1) }
     | REDUCE LPAR FunArg COMMA Exp COMMA Exp RPAR
                      { Reduce ($3, $5, $7, (), $1) }
     | MAP LPAR FunArg COMMA Exp RPAR

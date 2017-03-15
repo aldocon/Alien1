@@ -219,6 +219,14 @@ and checkExp  (ftab : FunTable)
         then (Array Int, Iota (n_exp_dec, pos))
         else raise (MyError ("Iota: wrong argument type "+ppType e_type, pos))
 
+    | Range (a_exp, n_exp, s_exp, pos) ->
+        let (a_type, a_dec) = checkExp ftab vtab a_exp
+        let (n_type, n_dec) = checkExp ftab vtab n_exp
+        let (s_type, s_dec) = checkExp ftab vtab s_exp
+        match (a_type, n_type, s_type) with
+            | (Int, Int, Int) -> (Array Int, Range (a_dec, n_dec, s_dec, pos))
+            | other -> raise (MyError ("Range: Arguments not (int, int, int)", pos))
+
     | Reduce (f, n_exp, arr_exp, _, pos) ->
         let (n_type  , n_dec) = checkExp ftab vtab n_exp
         let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
@@ -261,7 +269,7 @@ and checkExp  (ftab : FunTable)
         let (n_tp, n_dec) = checkExp ftab vtab n_exp 
         let (a_tp, a_dec) = checkExp ftab vtab a_exp
         match n_tp with
-            | Int -> (Array a_tp, Replicate(n_dec, a_dec, a_tp, pos))
+            | Int -> (Array a_tp, Replicate (n_dec, a_dec, a_tp, pos))
             | _ -> raise (MyError ("Replicate error: n_exp not of int type " + ppType n_tp, pos))
 
     (*  TODO project task 2: Hint for `map(f, arr)`
@@ -272,23 +280,8 @@ and checkExp  (ftab : FunTable)
          - the result of `map` should have type `[tb]`
     *)
     | Map (f, arr_exp, _, _, pos) ->
-        let (arr_t, arr_dec) = checkExp ftab vtab arr_exp
-        let elem_type = 
-          match arr_t with
-            | Array t -> t
-            | other -> raise(MyError ("Map: Argument not an array", pos))
+        failwith "Unimplemented type check of map"
 
-        match checkFunArg ftab vtab pos f with
-            | (f, res, [a1;a2]) ->
-                if a1 = a2 && a1 = res
-                then (Array res, Map(f, arr_dec, a1, a2, pos))
-                else raise (MyError( "Map: incompatible function type of " + 
-                                    (ppFunArg 0 f) + ": " + showFunType ([a1;a2], res)
-                                     , pos))
-            | (_, res, args) ->
-                raise (MyError( "Map: incompatible function type of " + 
-                                    (ppFunArg 0 f) + ": " + showFunType (args, res)
-                                     , pos))
 
 //        let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
 //        let elem_type =
