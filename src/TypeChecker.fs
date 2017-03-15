@@ -279,42 +279,35 @@ and checkExp  (ftab : FunTable)
     (*  TODO project task 2: Hint for `map(f, arr)`
         Look into the type-checking lecture slides for the type rule of `map`.
         Use `checkFunArg` to get the signature of the function argument `f`.
-        If `f` has type `ta -> tb` then 
+        If `f` has type `ta -> tb` then
          - `arr` should be of type `[ta]`
          - the result of `map` should have type `[tb]`
     *)
     | Map (f, arr_exp, _, _, pos) ->
-        failwith "Unimplemented type check of map"
+        let (arr_t, arr_dec) = checkExp ftab vtab arr_exp
+        let elem_type =
+          match arr_t with
+            | Array t -> t
+            | other -> raise(MyError ("Map: Argument not an array", pos))
+        let (f', f_res_type) =
+          match checkFunArg ftab vtab pos f with
+            | (f', res, [a1]) ->
+                if elem_type = a1
+                then (f', res)
+                else raise (MyError( "Map: incompatible function type of " +
+                                    (ppFunArg 0 f) + ": " + showFunType ([a1], res)
+                                     , pos))
+            | (_, res, args) ->
+                raise (MyError( "Map: incompatible function type of " +
+                                    (ppFunArg 0 f) + ": " + showFunType (args, res)
+                                     , pos))
+
+        (Array f_res_type, Map (f', arr_dec, elem_type, f_res_type, pos))
 
 
-//        let (arr_type, arr_dec) = checkExp ftab vtab arr_exp
-//        let elem_type =
-//            match arr_type with
-//              | Array t -> t
-//              | other -> raise (MyError ("Map: Argument not an array", pos))
-//        let (f', f_arg_type) = 
-//          match checkFunArg ftab vtab pos f with
-//              | (f', res, [a1;a2]) ->
-//                 if a1 = a2 && a1 = res
-//                 then (f', res)
-//                 else raise (MyError( "Map: incompatible function type of " +
-//                                       (ppFunArg 0 f) + ": " + showFunType ([a1,a2], res)
-//                                        , pos))
-//              | (_, res, args) ->
-//                raise (MyError ( "Reduce: incompatible function type of " +
-//                                  ppFunArg 0 f + ": " + showFunType (args, res)
-//                                , pos))
-//        let err (s, t) = MyError ( "Reduce: unexpected " + s + " type " + ppType t +
-//                                   ", expected " + ppType f_arg_type
-//                                 , pos)
-//        if   elem_type = f_arg_type then
-//             (elem_type, Map (f_arg_type, arr_dec, arr_type, f_arg_type, pos))
-//        else raise (err ("array element", elem_type))
-
-
-    (* TODO project task 2: `scan(f, ne, arr)` 
+    (* TODO project task 2: `scan(f, ne, arr)`
         Hint: Implementation is very similar to `reduce(f, ne, arr)`.
-              (The difference between `scan` and `reduce` is that 
+              (The difference between `scan` and `reduce` is that
               scan's return type is the same as the type of `arr`,
               while reduce's return type is that of an element of `arr`).
     *)

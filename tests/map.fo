@@ -1,0 +1,9 @@
+fun int plus5 (int n) = n + 5
+fun int plus (int x, int y) = x + y
+
+fun int main() =
+  let input = read(int) in
+  let inputArray = iota(input) in
+  let tmp = map(plus5, inputArray) in
+  let tmp = reduce(plus, 0, tmp) in
+  write(tmp)

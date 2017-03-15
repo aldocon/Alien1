@@ -651,8 +651,67 @@ let rec compileExp  (e      : TypedExp)
      It is useful to maintain two array iterators: one for the input array `arr`
      and one for the result array.
   *)
-  | Map (_, _, _, _, _) ->
-      failwith "Unimplemented code generation of map"
+  | Map (func, arr_in, tp_in, tp_out, pos) ->
+      let arr_in_reg  = newName "arr_reg"    (* address of input array *)
+      let arr_out_reg  = newName "arr_reg"   (* address of output array *)
+      let size_reg = newName "size_reg"      (* size of input array *)
+      let i_reg    = newName "ind_var"       (* loop counter *)
+      let tmp_reg  = newName "tmp_reg"       (* several purposes *)
+      let loop_beg = newName "loop_beg"
+      let loop_end = newName "loop_end"
+
+      let arr_in_code = compileExp arr_in vtable arr_in_reg
+      let header1 = [ Mips.LW(size_reg, arr_in_reg, "0") ]
+      
+      let arr_out_code = dynalloc(size_reg, place, tp_out)
+      (* Compile initial value into place (will be updated below) *)
+
+      (* Set arr_reg to address of first element instead. *)
+      (* Set i_reg to 0. While i < size_reg, loop. *)
+      let loop_code =
+              [ Mips.ADDI(arr_in_reg, arr_in_reg, "4")
+              ; Mips.MOVE(i_reg, "0")
+              ; Mips.ADDI(arr_out_reg, place, "4")
+              ; Mips.LABEL(loop_beg)
+              ; Mips.SUB(tmp_reg, i_reg, size_reg)
+              ; Mips.BGEZ(tmp_reg, loop_end)
+              ]
+      (* Load arr[i] into tmp_reg *)
+      let load_code =
+              match getElemSize tp_in with
+                | One  -> [ Mips.LB   (tmp_reg, arr_in_reg, "0")
+                          ; Mips.ADDI (arr_in_reg, arr_in_reg, "1")
+                          ]
+                | Four -> [ Mips.LW   (tmp_reg, arr_in_reg, "0")
+                          ; Mips.ADDI (arr_in_reg, arr_in_reg, "4")
+                          ]
+          (* place := binop(tmp_reg, place) *)
+      let apply_code =
+              applyFunArg(func, [tmp_reg], vtable, tmp_reg, pos)
+      
+      let save_code =
+              match getElemSize tp_out with
+                | One  -> [ Mips.SB  (tmp_reg, arr_out_reg, "0")
+                          ; Mips.ADDI (arr_out_reg, arr_out_reg, "1")
+                          ]
+                | Four -> [ Mips.SW   (tmp_reg, arr_out_reg, "0")
+                          ; Mips.ADDI (arr_out_reg, arr_out_reg, "4")
+                          ]
+ 
+      arr_in_code
+      @ header1
+      @ arr_out_code
+      @ loop_code
+      @ load_code
+      @ apply_code
+      @ save_code
+      @
+         [ Mips.ADDI(i_reg, i_reg, "1")
+         ; Mips.J loop_beg
+         ; Mips.LABEL loop_end
+         ]
+
+
 
   (* TODO project task 2: see also the comment to replicate.
      `scan(f, ne, arr)`: you can inspire yourself from the implementation of 
