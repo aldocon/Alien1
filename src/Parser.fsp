@@ -39,10 +39,12 @@ let parse_error_rich =
 %token <(int*int)> IF THEN ELSE LET IN EOF
 %token <(int*int)> INT CHAR BOOL
 %token <(int*int)> PLUS MINUS LESS
+
 %token <(int*int)> RANGE REPLICATE REDUCE IOTA
-%token <(int*int)> MULT DIV AND OR DEQ LTH EQ OP ARROW MAP
+%token <(int*int)> MULT DIV AND OR DEQ LTH EQ OP ARROW MAP SCAN
 %token <(int*int)> TRUE FALSE NOT FUN FN COMMA SEMICOLON READ WRITE
 %token <(int*int)> NEGATE
+
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
@@ -132,6 +134,8 @@ Exp : NUM            { Constant (IntVal (fst $1), snd $1) }
                      { Let (Dec (fst $2, $4, $3), $6, $1) }
     | ID LBRACKET Exp RBRACKET
                      { Index (fst $1, $3, (), $2) }
+    | SCAN LPAR FunArg COMMA Exp COMMA Exp RPAR
+                     { Scan ($3, $5, $7, (), $1) }   
 ;
 
 Exps : Exp COMMA Exps { $1 :: $3 }

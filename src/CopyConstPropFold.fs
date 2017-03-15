@@ -63,8 +63,8 @@ let rec copyConstPropFoldExp (vtable : VarTable)
                               and optimize the `body` of the let.
                     *)
                 | Let (Dec (name, e, decpos), body, pos) ->
-                    let e1 = Let (Dec (name, e, decpos), body, pos)
-                    let e2 = copyConstPropFoldExp vtable e1
+                    let e3 = Let (Dec (name, e, decpos), body, pos)
+                    let e2 = copyConstPropFoldExp vtable e1                  
                     Let (Dec (name, e2, decpos), body, pos)  
                     (* TODO project task 3:
                         Hint: this has the structure

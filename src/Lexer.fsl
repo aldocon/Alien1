@@ -73,6 +73,7 @@ let keyword (s, pos) =
        | "replicate"    -> Parser.REPLICATE pos
        | "range"        -> Parser.RANGE pos
        | "map"          -> Parser.MAP pos
+       | "scan"         -> Parser.SCAN pos 
        | _              -> Parser.ID (s, pos)
 }
 
