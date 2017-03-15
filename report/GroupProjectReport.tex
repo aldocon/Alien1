@@ -1,0 +1,28 @@
+\documentclass[a4paper,fleqn]{report}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage{pdfpages}
+\pagestyle{fancy}
+\lhead{IPS}
+\chead{Group Project}
+\rhead{Stefan Eugen Duro,\\ Christian Baun,\\Kenneth Novak}
+\cfoot{\thepage\ / \pageref{LastPage}}
+\begin{document}
+\input{content/titlePage.tex}
+\tableofcontents
+\chapter{Lexer}
+\input{content/Lexer.tex}
+\chapter{Parser}
+\input{content/Parser.tex}
+\chapter{Interpreter}
+\input{content/Interpreter.tex}
+\chapter{Type Checker}
+\input{content/TypeChecker.tex}
+\chapter{Machine Code Generation}
+\input{content/CodeGen.tex}
+\chapter{Testing}
+\input{content/Test.tex}
+\end{document}

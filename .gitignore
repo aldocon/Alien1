@@ -8,3 +8,11 @@
 #Make exception for folders src and tests
 !/src
 !/tests
+
+#Exclude report folder
+!/report
+**.log
+**.aux
+**.gz
+**.pdf
+**.toc

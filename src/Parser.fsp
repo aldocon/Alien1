@@ -46,8 +46,7 @@ let parse_error_rich =
 %token <(int*int)> LPAR RPAR LBRACKET RBRACKET LCURLY RCURLY
 
 %nonassoc ifprec letprec
-%left DEQ LTH NOT
-%left AND OR
+%left DEQ LTH AND OR NOT
 %left PLUS MINUS
 %left MULT DIV NEGATE
 
@@ -87,7 +86,7 @@ Params : Type ID COMMA Params
 ;
 
 ///////////////////////////////////////////////////////
-// TODO: project tasks 1,2,4: 
+// Todo: project tasks 1,2,4: 
 //       add grammer rules for the new expressions
 ///////////////////////////////////////////////////////
 
